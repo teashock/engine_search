@@ -1,0 +1,17 @@
+# CLion & CMake
+cmake-build-*/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Compiled files
+*.o
+*.out
+*.exe
+*.obj
+
+# Logs
+*.log
