@@ -10,14 +10,11 @@
 #define CONVERTERJSON_H
 
 #include <vector>
-#include <fstream>
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
+#include <iostream>
 
 class ConverterJSON {
 public:
-    ConverterJSON();
+    ConverterJSON() = default;
 
     /**
      * Метод получения содержимого файлов
@@ -44,11 +41,5 @@ public:
      */
     void putAnswers(std::vector<std::vector<std::pair<int, float>>> answers);
 
-private:
-    json config_read;
-    json requests_read;
-
-    void loadConfig();
-    void loadRequests();
 };
 #endif

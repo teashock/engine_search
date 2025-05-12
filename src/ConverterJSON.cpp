@@ -3,46 +3,25 @@
 //
 
 #include "../include/ConverterJSON.h"
-#include <iostream>
 
-ConverterJSON::ConverterJSON() {
-    loadConfig();
-    loadRequests();
-}
+#include <fstream>
+#include <nlohmann/json.hpp>
 
-void ConverterJSON::loadConfig() {
-    std::ifstream config_file("../bin/config.json");
-
-    if (!config_file.is_open()) {
-        std::cerr << "Config file is missing!" << std::endl;
-        return;
-    }
-
-    try {
-        config_file >> config_read;
-    } catch (const std::exception& e) {
-        std::cerr << "Error reading configuration file: " << e.what() << std::endl;
-    }
-
-    if (!config_read.contains("config")) {
-        std::cerr << "Config file is empty!" << std::endl;
-        return;
-    }
-
-    std::string name = config_read["config"].value("name", "");
-    std::string version = config_read["config"].value("version", "");
-
-    if (version != "0.1") {
-        std::cerr << "config.json has incorrect file version!" << std::endl;
-    }
-
-    std::cout << "Starting " << name << ", version " << version << std::endl;
-}
+using json = nlohmann::json;
 
 std::vector<std::string> ConverterJSON::GetTextDocuments() {
     std::vector<std::string> documents;
+    json config_data;
 
-    for (const auto& doc : config_read["files"]) {
+    std::ifstream config_file("../bin/config.json");
+    config_file >> config_data;
+
+    if (!config_data.contains("files")) {
+        std::cerr << "'files' section is missing in the config!" << std::endl;
+        return documents;
+    }
+
+    for (const auto& doc : config_data["files"]) {
         std::ifstream doc_file(doc);
         if (!doc_file.is_open()) {
             std::cerr << "File " << doc << " is missing!" << std::endl;
@@ -56,34 +35,26 @@ std::vector<std::string> ConverterJSON::GetTextDocuments() {
 }
 
 int ConverterJSON::GetResponsesLimit() {
-    if (config_read.contains("config") && config_read["config"].contains("max_responses")) {
-        return config_read["config"]["max_responses"].get<int>();
+    std::ifstream config_file("../bin/config.json");
+    json config_data;
+    config_file >> config_data;
+    if (config_data.contains("config") && config_data["config"].contains("max_responses")) {
+        return config_data["config"]["max_responses"].get<int>();
     }
     return 5;
 }
 
-void ConverterJSON::loadRequests() {
-    std::ifstream request_file("../bin/requests.json");
-    if (!request_file.is_open()) {
-        std::cerr << "Request file is missing!" << std::endl;
-        return;
-    }
-    try {
-        request_file >> requests_read;
-    } catch (const std::exception& e) {
-        std::cerr << "Error reading requests file: " << e.what() << std::endl;
-    }
-}
-
 std::vector<std::string> ConverterJSON::GetRequests() {
     std::vector<std::string> results;
-
-    if (!requests_read.contains("requests")) {
+    std::ifstream request_file("../bin/requests.json");
+    json request_data;
+    request_file >> request_data;
+    if (!request_data.contains("requests")) {
         std::cerr << "Missing or invalid 'requests' section in requests.json!" << std::endl;
         return results;
     }
 
-    for (const auto& request : requests_read["requests"]) {
+    for (const auto& request : request_data["requests"]) {
         results.push_back(request.get<std::string>());
     }
     return results;

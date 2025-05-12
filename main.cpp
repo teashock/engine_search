@@ -2,10 +2,59 @@
 #include "include/InvertedIndex.h"
 #include "include/SearchServer.h"
 #include <iostream>
+#include <fstream>
+#include <nlohmann/json.hpp>
 
+using json = nlohmann::json;
+
+void loadConfig(const std::string& filename) {
+    std::ifstream config_file(filename);
+
+    if (!config_file.is_open()) {
+        throw std::runtime_error("Config file is missing");
+    }
+
+    json config_data;
+
+    try {
+        config_file >> config_data;
+    } catch (const std::exception& e) {
+        std::cerr << "Error reading configuration file: " << e.what() << std::endl;
+    }
+
+    if (!config_data.contains("config")) {
+        std::cerr << "Config file is empty!" << std::endl;
+        return;
+    }
+
+    std::string name = config_data["config"].value("name", "");
+    std::string version = config_data["config"].value("version", "");
+
+    if (version != "0.1") {
+        std::cerr << "config.json has incorrect file version!" << std::endl;
+    }
+
+    std::cout << "Starting " << name << ", version " << version << std::endl;
+}
+
+void loadRequest(const std::string& filename) {
+    std::ifstream request_file(filename);
+    if (!request_file.is_open()) {
+        throw std::runtime_error("Request file is missing");
+    }
+    json request_data;
+    try {
+        request_file >> request_data;
+    } catch (const std::exception& e) {
+        std::cerr << "Error reading requests file: " << e.what() << std::endl;
+    }
+}
 
 int main() {
     try {
+        loadConfig("../bin/config.json");
+        loadRequest("../bin/requests.json");
+
         // 1. Создаём объект ConverterJSON для чтения конфигурации, документов и запросов
         ConverterJSON converter;
 

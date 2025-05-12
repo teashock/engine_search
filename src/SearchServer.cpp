@@ -38,7 +38,6 @@ std::vector<std::vector<RelativeIndex>> SearchServer::search(const std::vector<s
         }
 
         if (doc_absolute_relevance.empty()) {
-            // нет подходящих документов
             results.push_back({});
             continue;
         }
