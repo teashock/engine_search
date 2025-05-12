@@ -37,6 +37,9 @@ add_custom_command(TARGET search_engine POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
         ${CMAKE_SOURCE_DIR}/bin/requests.json
         ${CMAKE_BINARY_DIR}/requests.json
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_BINARY_DIR}/answers.json
+        ${CMAKE_SOURCE_DIR}/bin/answers.json
 )
 
 target_link_libraries(search_engine
