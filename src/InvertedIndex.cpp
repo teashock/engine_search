@@ -12,6 +12,7 @@ void InvertedIndex::UpdateDocumentBase(std::vector<std::string> input_docs) {
 
     std::vector<std::thread> threads;
 
+    // 1. Обработка документов по потокам
     for (size_t docId = 0; docId < input_docs.size(); ++docId) {
         threads.emplace_back([this, docId]() {
             std::map<std::string, size_t> wordCount;

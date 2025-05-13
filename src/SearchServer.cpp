@@ -63,7 +63,6 @@ std::vector<std::vector<RelativeIndex>> SearchServer::search(const std::vector<s
             }
             return a.doc_id < b.doc_id;
         });
-
         ConverterJSON converter;
         int max_responses = converter.GetResponsesLimit();
         if (relative_indices.size() > static_cast<size_t>(max_responses)) {
