@@ -16,7 +16,7 @@ A simple C++ search engine implemented as a console application (executable, run
 5. Находятся документы, содержащие все слова из запроса.
 6. Результаты ранжируются и сортируются. Максимум задаётся в `max_responses`.
 7. Ответы сохраняются в `answers.json`.
-
+   
 1. Files to be searched are listed in `bin/config.json`.
 2. The engine indexes all listed files.
 3. Queries are passed via `bin/requests.json`.
