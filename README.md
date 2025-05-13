@@ -100,6 +100,7 @@ build\Release\search_engine.exe
 
 When you run `search_engine.exe`, it will create a file named `answer.json` containing the processed query results.
 You can open this file with any text editor, such as Notepad or VS Code.
+
 ---
 
 ## ✅ Тестирование / Testing
