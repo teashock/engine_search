@@ -43,7 +43,6 @@ A simple C++ search engine implemented as a console application (executable, run
 | **CMake**         | ≥ 3.15           | Сборочная система / Build system |
 | **Git**           | Любая / Any      | Клонирование / Clone repo |
 | **MinGW**         | GCC ≥ 9.0        | Компилятор / Windows compiler |
-| **Visual Studio** | 2019/2022        | Компилятор MSVC / MSVC build |
 
 Проверьте наличие утилит:
 Ensure these are available in terminal:
@@ -75,24 +74,6 @@ build/search_engine.exe
 
 ---
 
-## 🛠️ Сборка c MSVC / Building with MSVC
-
-1. Установите Visual Studio с компонентом "C++ для рабочего стола" / Install Visual Studio with "Desktop C++" workload.
-2. Откройте терминал: x64 Native Tools Command Prompt for VS 2022
-3. Выполните / Run:
-```bash
-mkdir build
-cd build
-cmake .. -G "Visual Studio 17 2022" -A x64
-cmake --build . --config Release
-```
-
-Файл будет создан: / Executable will be created:
-```
-build\Release\search_engine.exe
-```
-
----
 ## 🛠️ Запуск программы/Run
 
 При запуске `search_engine.exe` будет создан файл `answer.json`, содержащий результаты обработки запросов.
@@ -105,22 +86,14 @@ You can open this file with any text editor, such as Notepad or VS Code.
 
 ## ✅ Тестирование / Testing
 
-### MinGW
 ```bash
 cmake .. -G "MinGW Makefiles" -DBUILD_TESTS=ON
 mingw32-make
 ctest
 ```
 
-### MSVC
-```bash
-cmake .. -G "Visual Studio 17 2022" -A x64 -DBUILD_TESTS=ON
-cmake --build . --config Debug
-ctest -C Debug
-```
-
 | Режим / Mode       | Команда / Command                     | Назначение / What it does                 |
 | ------------------ | ------------------------------------- | ----------------------------------------- |
-| **Основной**       | `cmake ..`                            | Сборка основного приложения / Main build |
+| **Основной**       | `cmake ..`                            | Сборка основного приложения / Main build  |
 | **Тестовый**       | `-DBUILD_TESTS=ON`                    | Включает тесты / Enables tests            |
 | **Только тесты**   | `-DONLY_TESTS=ON -DBUILD_TESTS=ON`    | Только тесты / Build only tests           |
