@@ -71,7 +71,6 @@ mingw32-make
 ```
 build/search_engine.exe
 ```
-
 Также будут скопированы / Also copied: `config.json`, `requests.json`
 ---
 
