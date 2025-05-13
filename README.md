@@ -73,7 +73,6 @@ build/search_engine.exe
 ```
 
 Также будут скопированы / Also copied: `config.json`, `requests.json`
-
 ---
 
 ## 🛠️ Сборка c MSVC / Building with MSVC
@@ -93,6 +92,14 @@ cmake --build . --config Release
 build\Release\search_engine.exe
 ```
 
+---
+## 🛠️ Запуск программы/Run
+
+При запуске `search_engine.exe` будет создан файл `answer.json`, содержащий результаты обработки запросов.
+Этот файл можно открыть с помощью любого текстового редактора, например Блокнота или VS Code.
+
+When you run `search_engine.exe`, it will create a file named `answer.json` containing the processed query results.
+You can open this file with any text editor, such as Notepad or VS Code.
 ---
 
 ## ✅ Тестирование / Testing
