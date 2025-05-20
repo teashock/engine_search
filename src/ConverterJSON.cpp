@@ -60,6 +60,17 @@ std::vector<std::string> ConverterJSON::GetRequests() {
     return results;
 }
 
+int ConverterJSON::GetUpdateTime() {
+    std::ifstream config_file("../bin/config.json");
+    json config_data;
+    config_file >> config_data;
+
+    if (config_data.contains("config") && config_data["config"].contains("update_time")) {
+        return config_data["config"]["update_time"].get<int>();
+    }
+    return 0;
+}
+
 void ConverterJSON::putAnswers(std::vector<std::vector<std::pair<int, float>>> answers) {
     json answer_JSON;
 
@@ -72,15 +83,19 @@ void ConverterJSON::putAnswers(std::vector<std::vector<std::pair<int, float>>> a
         } else {
             request_ID = std::to_string(i + 1);
         }
-
         std::string key = "request" + request_ID;
 
+
+
         if (answers[i].empty()) {
-            answer_JSON["answers"][key]["result"] = "false";
+            answer_JSON["answers"][key]["result"] = false;
+            answer_JSON["answers"][key]["relevance"] = json::array();
         } else {
-            answer_JSON["answers"][key]["result"] = "true";
+            answer_JSON["answers"][key]["result"] = true;
             json relevance_array = json::array();
-            for (const auto& [docid, rank] : answers[i]) {
+            for (size_t j = 0; j < answers[i].size(); ++j) {
+                int docid = answers[i][j].first;
+                float rank = answers[i][j].second;
                 relevance_array.push_back({ {"docid", docid}, {"rank", rank} });
             }
             answer_JSON["answers"][key]["relevance"] = relevance_array;

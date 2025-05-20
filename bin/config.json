@@ -2,6 +2,7 @@
   "config": {
     "name": "SearchEngine",
     "version": "0.1",
+    "update_time": 20,
     "max_responses": 5
   },
   "files": [

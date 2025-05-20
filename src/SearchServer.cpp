@@ -44,16 +44,19 @@ std::vector<std::vector<RelativeIndex>> SearchServer::search(const std::vector<s
 
         //3. Находим максимальную абсолютную релевантность
         size_t max_relevance = 0;
-        for (const auto& [doc_id, relevance] : doc_absolute_relevance) {
-            if (relevance > max_relevance) {
-                max_relevance = relevance;
+        for (std::map<size_t, size_t>::const_iterator it = doc_absolute_relevance.begin(); it != doc_absolute_relevance.end(); ++it) {
+            if (it->second > max_relevance) {
+                max_relevance = it->second;
             }
         }
 
         //4. Формируем список результатов
         std::vector<RelativeIndex> relative_indices;
-        for (const auto& [doc_id, relevance] : doc_absolute_relevance) {
-            relative_indices.push_back(RelativeIndex{doc_id, static_cast<float>(relevance)/ static_cast<float>(max_relevance)});
+        for (std::map<size_t, size_t>::const_iterator it = doc_absolute_relevance.begin(); it != doc_absolute_relevance.end(); ++it) {
+            RelativeIndex ri;
+            ri.doc_id = it->first;
+            ri.rank = static_cast<float>(it->second) / static_cast<float>(max_relevance);
+            relative_indices.push_back(ri);
         }
 
         //5. Сортировка по убыванию релевантности
@@ -63,6 +66,7 @@ std::vector<std::vector<RelativeIndex>> SearchServer::search(const std::vector<s
             }
             return a.doc_id < b.doc_id;
         });
+
         ConverterJSON converter;
         int max_responses = converter.GetResponsesLimit();
         if (relative_indices.size() > static_cast<size_t>(max_responses)) {

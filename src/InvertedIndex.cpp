@@ -14,9 +14,9 @@ void InvertedIndex::UpdateDocumentBase(std::vector<std::string> input_docs) {
 
     // 1. Обработка документов по потокам
     for (size_t docId = 0; docId < input_docs.size(); ++docId) {
-        threads.emplace_back([this, docId]() {
+        threads.emplace_back([this, docId, &input_docs]() {
             std::map<std::string, size_t> wordCount;
-            std::istringstream iss(docs[docId]);
+            std::istringstream iss(input_docs[docId]);
             std::string word;
 
             while (iss >> word) {
@@ -24,8 +24,8 @@ void InvertedIndex::UpdateDocumentBase(std::vector<std::string> input_docs) {
             }
 
             std::lock_guard<std::mutex> lock(freq_mutex);
-            for (const auto& [word, count] : wordCount) {
-                freq_dictionary[word].push_back({docId, count});
+            for (std::map<std::string, size_t>::const_iterator it = wordCount.begin(); it != wordCount.end(); ++it) {
+                freq_dictionary[it->first].push_back(Entry{docId, it->second});
             }
         });
     }

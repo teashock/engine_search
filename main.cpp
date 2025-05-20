@@ -3,19 +3,18 @@
 #include "include/SearchServer.h"
 #include <iostream>
 #include <fstream>
+#include <thread>
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
 void loadConfig(const std::string& filename) {
     std::ifstream config_file(filename);
-
     if (!config_file.is_open()) {
         throw std::runtime_error("Config file is missing");
     }
 
     json config_data;
-
     try {
         config_file >> config_data;
     } catch (const std::exception& e) {
@@ -42,11 +41,22 @@ void loadRequest(const std::string& filename) {
     if (!request_file.is_open()) {
         throw std::runtime_error("Request file is missing");
     }
+
     json request_data;
     try {
         request_file >> request_data;
     } catch (const std::exception& e) {
         std::cerr << "Error reading requests file: " << e.what() << std::endl;
+    }
+}
+
+void runIndexUpdate(InvertedIndex& index, ConverterJSON& converter, int interval_seconds) {
+    while (true) {
+        std::this_thread::sleep_for(std::chrono::seconds(interval_seconds));
+        std::cout << "[AutoUpdate] Re-indexing documents..." << std::endl;
+        std::vector<std::string> docs = converter.GetTextDocuments();
+        index.UpdateDocumentBase(docs);
+        std::cout << "[AutoUpdate] Index updated!" << std::endl;
     }
 }
 
@@ -57,14 +67,23 @@ int main() {
 
         // 1. Создаём объект ConverterJSON для чтения конфигурации, документов и запросов
         ConverterJSON converter;
+        int update_time = converter.GetUpdateTime();
+        if (update_time > 0) {
+            std::cout << "[Main] Update time: " << update_time << std::endl;
+        }
 
-        // 2. Получаем документы и запросы
+        // 2. Получаем документы, запросы и время обновления
         std::vector<std::string> documents = converter.GetTextDocuments();
         std::vector<std::string> requests = converter.GetRequests();
 
         // 3. Создаём и заполняем обратный индекс
         InvertedIndex index;
         index.UpdateDocumentBase(documents);
+
+        if (update_time > 0) {
+            std::thread update_thread(runIndexUpdate, std::ref(index), std::ref(converter), update_time);
+            update_thread.detach();
+        }
 
         // 4. Создаём поисковый сервер
         SearchServer search_server(index);
@@ -74,17 +93,24 @@ int main() {
 
         // 6. Сохраняем результаты поиска
         std::vector<std::vector<std::pair<int, float>>> answers;
-        for (const auto& result : search_results) {
+        for (size_t i = 0; i < search_results.size(); ++i) {
             std::vector<std::pair<int, float>> answer_line;
-            for (const auto& entry : result) {
-                answer_line.emplace_back(entry.doc_id, entry.rank);
+            for (size_t j = 0; j < search_results[i].size(); ++j) {
+                answer_line.push_back(std::make_pair(search_results[i][j].doc_id, search_results[i][j].rank));
             }
             answers.push_back(answer_line);
         }
 
         converter.putAnswers(answers);
-
         std::cout << "The search is completed. The results are saved in \"answers.json\".\n";
+        if (update_time > 0) {
+            std::cout << "\nSearch engine is running in watch mode (auto reindexing enabled)...\n";
+            std::cout << "Press Ctrl+C to stop the program.\n";
+            while (true) {
+                std::this_thread::sleep_for(std::chrono::seconds(10));
+                std::cout << "[Main] Waiting...\n";
+            }
+        }
     } catch (const std::exception& ex) {
         std::cerr << "Error: " << ex.what() << std::endl;
         return 1;
