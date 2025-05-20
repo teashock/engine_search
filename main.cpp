@@ -107,7 +107,7 @@ int main() {
             std::cout << "\nSearch engine is running in watch mode (auto reindexing enabled)...\n";
             std::cout << "Press Ctrl+C to stop the program.\n";
             while (true) {
-                std::this_thread::sleep_for(std::chrono::seconds(10));
+                std::this_thread::sleep_for(std::chrono::seconds(update_time));
                 std::cout << "[Main] Waiting...\n";
             }
         }
